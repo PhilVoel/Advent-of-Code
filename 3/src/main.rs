@@ -5,6 +5,7 @@ fn main() {
              .collect::<Vec<char>>()
         )
         .collect::<Vec<Vec<char>>>();
+    let mut gear_nums = vec![vec![Vec::new(); 140]; 140];
     let mut sum = 0;
     for (ln, l) in input.iter().enumerate() {
         let mut num_start = 0;
@@ -37,7 +38,7 @@ fn main() {
                         ln+1
                     }
                 };
-                'add: for line in lower_line..=upper_line {
+                for line in lower_line..=upper_line {
                     let lower_col = {
                         if num_start == 0 {
                             0
@@ -46,15 +47,11 @@ fn main() {
                             num_start-1
                         }
                     };
-                    println!("{}, {}, {}, {}", line, lower_col, cn, number);
                     for col in lower_col..=cn {
                         match input[line as usize][col as usize] {
                             '.' => (),
                             c if c.is_ascii_alphanumeric() => (),
-                            _ => {
-                                sum += number;
-                                break 'add;
-                            }
+                            _ => gear_nums[line as usize][col as usize].push(number)
                         }
                     }
                 }
@@ -62,6 +59,16 @@ fn main() {
             if c.is_ascii_alphanumeric() && !num {
                 num_start = cn;
                 num = true;
+            }
+        }
+    }
+    for (ln, l) in input.iter().enumerate() {
+        for (cn, c) in l.iter().enumerate() {
+            if *c == '*' {
+                let numbers = &gear_nums[ln][cn];
+                if numbers.len() == 2 {
+                    sum += numbers[0] * numbers[1];
+                }
             }
         }
     }
