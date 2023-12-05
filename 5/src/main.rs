@@ -22,6 +22,18 @@ impl Map {
     }
 }
 
+#[derive(Debug)]
+struct Soils {
+    start: i64,
+    end: i64,
+}
+
+impl Soils {
+    fn new(start: i64, end: i64) -> Soils {
+        Soils { start, end }
+    }
+}
+
 fn convert(input: i64, maps: &Vec<Map>) -> i64 {
     for map in maps {
         if let Some(output) = map.try_convert(input) {
@@ -42,7 +54,7 @@ fn full_conversion(input: i64, maps: &Vec<&mut Vec<Map>>) -> i64 {
 }
 
 fn main() {
-    let mut seeds: Vec<i64> = Vec::new();
+    let mut seeds: Vec<Soils> = Vec::new();
     let mut seed_to_soil: Vec<Map> = Vec::new();
     let mut soil_to_fertilizer: Vec<Map> = Vec::new();
     let mut fertilizer_to_water: Vec<Map> = Vec::new();
@@ -63,10 +75,13 @@ fn main() {
 
     let input = std::fs::read_to_string("input").unwrap();
     let mut lines = input.lines();
-    for mut num in lines.next().unwrap().split_once(":").unwrap().1.split(" ") {
-        num = num.trim();
-        if num != "" {
-            seeds.push(num.parse().unwrap());
+    let mut nums = lines.next().unwrap().split_once(":").unwrap().1.split(" ").into_iter();
+    while let Some(mut num1) = nums.next() {
+        num1 = num1.trim();
+        if num1 != "" {
+            let num1 = num1.parse::<i64>().unwrap();
+            let num2 = nums.next().unwrap().trim().parse::<i64>().unwrap() + num1;
+            seeds.push(Soils::new(num1, num2));
         }
     }
     lines.next();
@@ -81,7 +96,12 @@ fn main() {
         current_map.push(Map::new(line));
     }
     println!("{}", seeds.iter()
-             .map(|seed| full_conversion(*seed, &all_maps))
+             .map(|seed_range| {
+                 println!("{:?}", seed_range);
+                 (seed_range.start..seed_range.end).map(|seed| {
+                     full_conversion(seed, &all_maps)
+                 }).min().unwrap()
+             })
              .min().unwrap()
     );
 }
