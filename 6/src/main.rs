@@ -6,20 +6,15 @@ fn main() {
              .1
              .split(' ')
              .filter(|x| !x.is_empty())
-             .map(|x| x.parse::<u32>().unwrap())
-             .collect::<Vec<u32>>()
-        )
-        .collect::<Vec<Vec<u32>>>();
-    println!("{:?}", lines[0].iter().enumerate()
-        .map(|(i,time)| {
-            let record = lines[1][i];
-            for j in 0..*time {
-                if (time-j) * j > record {
-                    return time+1-2*(j);
-                }
-            }
-            return 0;
-        })
-        .reduce(|a,b| a*b).unwrap()
-    );
+             .collect::<Vec<&str>>()
+             .join("")
+             .parse::<u64>().unwrap()
+            ).collect::<Vec<u64>>();
+    let time = lines[0];
+    for j in 0..time {
+        if (time-j) * j > lines[1] {
+            println!("{}", time+1-2*(j));
+            return;
+        }
+    }
 }
