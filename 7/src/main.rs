@@ -46,6 +46,7 @@ impl Ord for Hand {
 
 #[derive(Clone, Copy, Eq, PartialOrd, PartialEq, Debug)]
 enum Card {
+    J,
     N2,
     N3,
     N4,
@@ -55,7 +56,6 @@ enum Card {
     N8,
     N9,
     T,
-    J,
     Q,
     K,
     A,
@@ -96,8 +96,14 @@ enum HandType {
 impl From<&[Card; 5]> for HandType {
     fn from(value: &[Card; 5]) -> Self {
         let mut counts = [0; 13];
+        let mut jokers = 0;
         for card in value.iter() {
-            counts[*card as usize] += 1;
+            if *card == Card::J {
+                jokers += 1;
+            }
+            else {
+                counts[*card as usize] += 1;
+            }
         }
         let mut count2 = false;
         let mut count3 = false;
@@ -106,11 +112,22 @@ impl From<&[Card; 5]> for HandType {
                 return HandType::FiveOfAKind;
             }
             else if *count == 4 {
-                return HandType::FourOfAKind;
+                if jokers == 1 {
+                    return HandType::FiveOfAKind;
+                }
+                else {
+                    return HandType::FourOfAKind;
+                }
             }
             else if *count == 3 {
                 if count2 {
                     return HandType::FullHouse;
+                }
+                else if jokers == 2 {
+                    return HandType::FiveOfAKind;
+                }
+                else if jokers == 1 {
+                    return HandType::FourOfAKind;
                 }
                 else {
                     count3 = true;
@@ -120,8 +137,17 @@ impl From<&[Card; 5]> for HandType {
                 if count3 {
                     return HandType::FullHouse;
                 }
+                else if count2 && jokers == 1{
+                    return HandType::FullHouse;
+                }
                 else if count2 {
                     return HandType::TwoPair;
+                }
+                else if jokers == 3 {
+                    return HandType::FiveOfAKind;
+                }
+                else if jokers == 2 {
+                    return HandType::FourOfAKind;
                 }
                 else {
                     count2 = true;
@@ -131,7 +157,25 @@ impl From<&[Card; 5]> for HandType {
         if count3 {
             HandType::ThreeOfAKind
         }
+        else if count2 && jokers == 1 {
+            HandType::ThreeOfAKind
+        }
         else if count2 {
+            HandType::OnePair
+        }
+        else if jokers == 5 {
+            HandType::FiveOfAKind
+        }
+        else if jokers == 4 {
+            HandType::FiveOfAKind
+        }
+        else if jokers == 3 {
+            HandType::FourOfAKind
+        }
+        else if jokers == 2 {
+            HandType::ThreeOfAKind
+        }
+        else if jokers == 1 {
             HandType::OnePair
         }
         else {
