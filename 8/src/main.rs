@@ -10,21 +10,34 @@ fn main() {
         let (left, right) = targets.trim_end_matches(")").split_once(", ").unwrap();
         (key.to_string(), (left.to_string(), right.to_string()))
     }).collect();
-    let mut current = nodes.get("AAA").unwrap();
-    let mut count = 0;
-    loop {
-        for direction in &directions {
-            let next = match direction {
-                'L' => &current.0,
-                'R' => &current.1,
-                _ => unreachable!("Invalid direction"),
-            };
-            count += 1;
-            if next == "ZZZ" {
-                println!("Found ZZZ after {count} tries");
-                return;
+    println!("{}", nodes.iter().filter(|(n, _)| n.ends_with('Z'))
+        .map(|(_, mut current)| {
+            let mut count = 0;
+            loop {
+                for direction in &directions {
+                    let next = match direction {
+                        'L' => &current.0,
+                        'R' => &current.1,
+                        _ => unreachable!("Invalid direction"),
+                    };
+                    count += 1;
+                    if next.ends_with('Z') {
+                        return count;
+                    }
+                    current = &nodes[next];
+                }
             }
-            current = &nodes[next];
+        }).reduce(|res, num| {
+            res*num/ggt(res,num)
         }
+        ).unwrap()
+    );
+}
+
+fn ggt(a: u64, b: u64) -> u64 {
+    if b == 0 {
+        a
+    } else {
+        ggt(b, a % b)
     }
 }
