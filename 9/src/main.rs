@@ -16,7 +16,7 @@ fn get_next(nums: Vec<i64>) -> i64 {
     for i in 0..nums.len()-1 {
         steps.push(nums[i+1] - nums[i]);
     }
-    nums.last().unwrap() + {
+    nums.first().unwrap() - {
         if steps.iter().all(|s| *s==0) {
             0
         } else {
