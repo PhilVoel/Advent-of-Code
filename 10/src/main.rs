@@ -7,8 +7,33 @@ enum PipeType {
     NW,
     SE,
     SW,
-    None,
+    NN,
 }
+
+impl PipeType {
+    fn north(&self) -> bool {
+        match self {
+            NS|NE|NW => true,
+            _ => false,
+        }
+    }
+
+    fn south(&self) -> bool {
+        match self {
+            NS|SE|SW => true,
+            _ => false,
+        }
+    }
+
+    fn west(&self) -> bool {
+        match self {
+            NW|SW|EW => true,
+            _ => false,
+        }
+    }
+}
+
+type PipePart = (PipeType, bool);
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 enum Direction {
@@ -22,7 +47,7 @@ use PipeType::*;
 use Direction::*;
 
 fn main() {
-    let pipes = std::fs::read_to_string("input").unwrap()
+    let mut pipes = std::fs::read_to_string("input").unwrap()
         .lines()
         .map(|line| line.chars()
              .map(|c| match c {
@@ -33,35 +58,60 @@ fn main() {
                  'J' => NW,
                  '7' => SW,
                  'F' => SE,
-                 '.' => None,
+                 '.' => NN,
                  _ => unreachable!(),
-             }).collect::<Vec<PipeType>>()
-        ).collect::<Vec<Vec<PipeType>>>();
+             }).map(|p| (p, false))
+            .collect::<Vec<PipePart>>()
+        ).collect::<Vec<Vec<PipePart>>>();
     let mut current = (0, 0);
     let mut last = Direction::East;
+    let mut first = (NN, false);
+    let mut start = (0, 0);
     for (i, row) in pipes.iter().enumerate() {
         for (j, pipe) in row.iter().enumerate() {
-            if *pipe == Start {
-                (current, last) = match pipes[i][j-1] {
-                    EW|NE|SE => ((j-1, i), West),
-                    _ => match pipes[i][j+1] {
-                        EW|NW|SW => ((j+1, i), East),
-                        _ => ((j, i-1), North)
+            if pipe.0 == Start {
+                start = (j, i);
+                let (n, s, e) = (pipes[i-1][j].0.south(), pipes[i+1][j].0.north(), pipes[i][j+1].0.west());
+                if n {
+                    current = (j, i-1);
+                    last = North;
+                    if s {
+                        first = (NS, true);
                     }
+                    else if e {
+                        first = (NE, true);
+                    }
+                    else {
+                        first = (NW, true);
+                    }
+                }
+                else if s {
+                    current = (j, i+1);
+                    last = South;
+                    if e {
+                        first = (SE, true);
+                    }
+                    else {
+                        first = (SW, true);
+                    }
+                }
+                else {
+                    current = (j+1, i);
+                    first = (EW, true);
+                    last = East;
                 }
             }
         }
     };
-    let mut count = 1;
+    pipes[start.1][start.0] = first;
     loop {
         let (x, y) = current;
         let pipe = pipes[y][x];
-        count += 1;
-        match (pipe, &last) {
-            (Start, _) => {
-                println!("{}", count/2);
-                break;
-            }
+        if pipe.1 {
+            break;
+        }
+        pipes[y][x] = (pipe.0, true);
+        match (pipe.0, &last) {
             (NE, West) |
             (NW, East) |
             (NS, North) => {
@@ -86,7 +136,32 @@ fn main() {
                 last = West;
                 current = (x-1, y);
             }
-            _ => unreachable!(),
+            _ => unreachable!("{x} {y} {:?} {:?}", last, pipe.0),
         };
     }
+    let mut count = 0;
+    for row in pipes {
+        let mut inside = false;
+        let mut first_pipe = NN;
+        for pipe in row {
+            if pipe.1 {
+                match (pipe.0, first_pipe) {
+                    (NS, NN) => inside = !inside,
+                    (p, NN) => first_pipe = p,
+                    (p, f) if p.north() && f.north() ||
+                        p.south() && f.south() => first_pipe = NN,
+                    (p, f) if p.north() && f.south() ||
+                        p.south() && f.north() => {
+                            inside = !inside;
+                            first_pipe = NN;
+                        }
+                    _ => (),
+                }
+            }
+            else if inside {
+                count += 1;
+            }
+        }
+    }
+    println!("{}", count);
 }
