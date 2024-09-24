@@ -17,10 +17,6 @@
 				findlib
 				ocamlformat
 			]);
-			shellHook = ''
-				export NIX_LDFLAGS="$(echo $NIX_LDFLAGS | sed "s/\/home\/philipp\/Programming\/Advent of Code\/2023-OCaml/file:\/\/\/home\/philipp\/Programming\/Advent%20of%20Code\/2023-OCaml/g")"
-			'';
-			PROMPT="%F{cyan}%n%F{blue}%F{cyan}%m%F{blue}:%F{magenta}%~ ";
 		};
 	};
 }
