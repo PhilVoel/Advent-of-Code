@@ -17,14 +17,14 @@
 					packages = [ghc-with-libs];
 				};
 				packages = builtins.listToAttrs (
-					map (name: {
-							inherit name;
+					map (day: rec {
+							name = "Day_${day}";
 							value = pkgs.stdenv.mkDerivation {
 								inherit name;
 								src = self;
 
 								nativeBuildInputs = [ghc-with-libs];
-								buildPhase = "ghc -working-dir src -o ${name} ${name}.hs";
+								buildPhase = ''ghc -working-dir src -DDAY=\"${day}\" -o ${name} Main.hs ${name}.hs'';
 
 								installPhase = ''
 									mkdir -p $out/bin
@@ -32,9 +32,7 @@
 								'';
 							};
 					})
-					(builtins.genList
-						(x: "Day_${toString (x+1)}")
-						1)
+					(builtins.genList (x: toString (x+1)) 2)
 				);
 			}
 		);
