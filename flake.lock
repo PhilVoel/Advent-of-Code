@@ -1,0 +1,40 @@
+{
+  "nodes": {
+    "jconsole": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1711384583,
+        "narHash": "sha256-D0S87QCMg9J/RDVZmOhd6eqFUbmuUDMIRRA2BwYO+RU=",
+        "type": "tarball",
+        "url": "https://www.jsoftware.com/download/j9.5/install/j9.5_linux64.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://www.jsoftware.com/download/j9.5/install/j9.5_linux64.tar.gz"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1733261153,
+        "narHash": "sha256-eq51hyiaIwtWo19fPEeE0Zr2s83DYMKJoukNLgGGpek=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b681065d0919f7eb5309a93cea2cfa84dec9aa88",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-24.11",
+        "type": "indirect"
+      }
+    },
+    "root": {
+      "inputs": {
+        "jconsole": "jconsole",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
