@@ -24,7 +24,7 @@
 								src = self;
 
 								nativeBuildInputs = [ghc-with-libs];
-								buildPhase = ''ghc -working-dir src -DDAY=\"${day}\" -o ${name} Main.hs ${name}.hs'';
+								buildPhase = ''ghc -working-dir src -o ${name} ${name}.hs'';
 
 								installPhase = ''
 									mkdir -p $out/bin
@@ -32,7 +32,7 @@
 								'';
 							};
 					})
-					(builtins.genList (x: toString (x+1)) 2)
+					(builtins.genList (x: toString (x+1)) 25)
 				);
 			}
 		);

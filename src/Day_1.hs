@@ -1,14 +1,18 @@
-module Solution where
-    import Data.Char (digitToInt)
-    import Data.List (sort)
+import Data.Char (digitToInt)
+import Data.List (sort)
+import System.Environment (getArgs)
 
-    type CommonIn = ([Integer], [Integer])
-    type CommonOut = [Integer]
+splitUp input = unzip $ map ((\[l,r] -> (read l, read r)) . words) $ lines input
 
-    commonPre input = unzip $ map ((\[l,r] -> (read l, read r)) . words) input
+part1 (left, right) = zipWith ((abs .) . (-)) (sort left) (sort right)
 
-    part1 (left, right) = zipWith ((abs .) . (-)) (sort left) (sort right)
+part2 (left, right) = map (\l -> sum $ filter (==l) right) left
 
-    part2 (left, right) = map (\l -> sum $ filter (==l) right) left
-
-    commonPost l = sum l
+main = do
+    args <- getArgs
+    input <- readFile "inputs/1.txt"
+    print . sum $
+        if "--part2" `notElem` args then
+            part1 . splitUp $ input
+        else
+            part2 . splitUp $ input
