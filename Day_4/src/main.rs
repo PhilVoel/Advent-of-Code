@@ -8,19 +8,16 @@ fn main() {
         changed = false;
         for i in 0..grid.len() {
             for j in 0..grid[0].len() {
-                // println!("\n{i}|{j}");
                 if grid[i][j] == '@' {
                     let mut local_count = 0;
                     let start_i = if i == 0 { 0 } else { i-1 };
                     let start_j = if j == 0 { 0 } else { j-1 };
                     for i2 in start_i..=i+1 {
                         for j2 in start_j..=j+1 {
-                            // println!("testing {i2}|{j2}:");
                             if match grid.get(i2) {
                                 Some(line) => line.get(j2).unwrap_or(&'.') == &'@',
                                 None => false
                             } {
-                                // println!("{i2}|{j2} = @");
                                 local_count += 1;
                             }
                         }
@@ -32,6 +29,9 @@ fn main() {
                     }
                 }
             }
+        }
+        if args().any(|arg| arg == "--part2") {
+            break;
         }
     }
     println!("{count}");
